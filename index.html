@@ -281,41 +281,6 @@
   .foot-social a:hover{opacity:1;text-decoration:underline;}
   .foot-bottom{border-top:1px solid rgba(247,237,231,.18);padding-top:22px;font-size:.82rem;opacity:.7;}
 
-  .popup-overlay{
-    position:fixed;inset:0;background:rgba(59,36,48,.45);
-    display:none;align-items:center;justify-content:center;z-index:300;padding:20px;
-  }
-  .popup-overlay.show{display:flex;}
-  .popup-window{
-    width:100%;max-width:420px;background:var(--bg-alt);
-    border:1px solid var(--line);border-radius:24px 6px 24px 6px;
-    box-shadow:var(--shadow);animation:popIn .35s ease;
-  }
-  @keyframes popIn{from{opacity:0;transform:translateY(14px) scale(.97);}to{opacity:1;transform:none;}}
-  @media (prefers-reduced-motion: reduce){ .popup-window{animation:none;} }
-  .popup-titlebar{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:14px 18px;border-bottom:1px solid var(--line);
-    font-family:var(--font-display);font-style:italic;font-size:1.2rem;color:var(--ink);
-  }
-  .popup-close{
-    background:transparent;border:none;color:var(--ink);cursor:pointer;
-    width:26px;height:26px;border-radius:50%;font-size:1.1rem;line-height:1;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .popup-close:hover{background:rgba(var(--rose-a),.15);}
-  .popup-body{padding:8px 20px 22px;}
-  .popup-body p{color:var(--ink-soft);font-size:.9rem;margin:0 0 14px;}
-  .popup-form{display:flex;flex-direction:column;gap:10px;}
-  .popup-form input,.popup-form textarea{
-    font-family:var(--font-body);font-size:.92rem;
-    padding:10px 13px;border:1px solid var(--line);border-radius:10px;
-    background:var(--bg);color:var(--ink);
-  }
-  .popup-form textarea{min-height:64px;resize:vertical;}
-  .popup-form button{align-self:flex-start;margin-top:2px;}
-  .popup-confirm{display:none;font-weight:600;color:var(--rose);font-size:.9rem;margin-top:4px;}
-  .popup-confirm.show{display:block;}
 </style>
 
 <nav class="nav">
@@ -422,25 +387,6 @@
     <div class="foot-bottom" id="footBottom"></div>
   </div>
 </footer>
-
-<div class="popup-overlay" id="popupOverlay">
-  <div class="popup-window">
-    <div class="popup-titlebar">
-      <span>bilhete rápido</span>
-      <button class="popup-close" id="popupClose" aria-label="Fechar">&times;</button>
-    </div>
-    <div class="popup-body">
-      <p>Antes que você feche essa aba: me conta rapidinho sobre quem precisa do atendimento e eu retorno com os próximos passos.</p>
-      <form class="popup-form" id="popupForm">
-        <input type="text" name="nome" placeholder="Seu nome" required>
-        <input type="tel" name="whatsapp" placeholder="WhatsApp" required>
-        <textarea name="mensagem" placeholder="Conta rapidinho o que você precisa"></textarea>
-        <button type="submit" class="btn-primary">Quero agendar</button>
-        <div class="popup-confirm" id="popupConfirm">Recebido! Te chamo em breve, ou fala comigo agora pelo WhatsApp.</div>
-      </form>
-    </div>
-  </div>
-</div>
 
 <script>
 (function(){
@@ -589,50 +535,6 @@
   } else {
     $$(".reveal").forEach(el => el.classList.add("is-visible"));
   }
-
-  // ---------- popup de captação rápida ----------
-  var POPUP_KEY = "fisioPopupDismissed";
-  var overlay = $("#popupOverlay");
-  var popupShown = false;
-
-  function showPopup(){
-    if (popupShown) return;
-    if (sessionStorage.getItem(POPUP_KEY) === "1") return;
-    popupShown = true;
-    overlay.classList.add("show");
-  }
-  function hidePopup(){
-    overlay.classList.remove("show");
-    try { sessionStorage.setItem(POPUP_KEY, "1"); } catch (err) {}
-  }
-
-  $("#popupClose").addEventListener("click", hidePopup);
-  overlay.addEventListener("click", function(e){
-    if (e.target === overlay) hidePopup();
-  });
-  document.addEventListener("keydown", function(e){
-    if (e.key === "Escape" && overlay.classList.contains("show")) hidePopup();
-  });
-
-  setTimeout(showPopup, 8000);
-  var heroSection = document.querySelector(".hero");
-  if (heroSection){
-    window.addEventListener("scroll", function(){
-      if (window.scrollY > heroSection.offsetHeight * 0.6) showPopup();
-    }, { passive: true });
-  }
-
-  $("#popupForm").addEventListener("submit", function(e){
-    e.preventDefault();
-    var f = e.target;
-    var assunto = encodeURIComponent("Contato rápido de " + f.nome.value);
-    var corpo = encodeURIComponent(
-      "Nome: " + f.nome.value + "\nWhatsApp: " + f.whatsapp.value + "\n\nMensagem:\n" + f.mensagem.value
-    );
-    window.location.href = "mailto:" + CONFIG.contato.email + "?subject=" + assunto + "&body=" + corpo;
-    $("#popupConfirm").classList.add("show");
-    setTimeout(hidePopup, 2200);
-  });
 
 })();
 </script>
